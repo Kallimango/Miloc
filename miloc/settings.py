@@ -73,6 +73,7 @@ REST_FRAMEWORK = {
 APPEND_SLASH = False
 
 MIDDLEWARE = [
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
 
