@@ -9,6 +9,9 @@
    id="svg1"
    inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
    sodipodi:docname="app-logo.svg"
+   inkscape:export-filename="app-logo.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="0.52572358"
-     inkscape:cx="911.1252"
-     inkscape:cy="561.13139"
+     inkscape:zoom="0.41486799"
+     inkscape:cx="-86.774591"
+     inkscape:cy="535.10998"
      inkscape:window-width="1920"
      inkscape:window-height="1011"
      inkscape:window-x="0"
@@ -38,6 +41,14 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:33.7;stroke-dasharray:none"
+       id="rect3"
+       width="300.48444"
+       height="299.7916"
+       x="-0.50327432"
+       y="0.50327498"
+       ry="68.877335" />
     <rect
        style="fill:#000000;stroke:#ffffff;stroke-width:0;stroke-dasharray:none"
        id="rect1"
@@ -99,7 +110,7 @@
        transform="scale(1.0171512,0.98313797)"><tspan
          sodipodi:role="line"
          id="tspan3"
-         style="font-size:81.2877px;stroke-width:0"
+         style="font-size:81.2877px;fill:#000000;stroke-width:0"
          x="23.384457"
          y="222.97945">MILOC</tspan></text>
   </g>
