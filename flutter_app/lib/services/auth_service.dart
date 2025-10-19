@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart'; // For checking kIsWeb
 
 class AuthService {
-  final String baseUrl = "http://127.0.0.1:8000/api";
+  final String baseUrl = "https://miloc.awerro.com/api";
 
   /// Login and return token + user details if successful
   Future<Map<String, dynamic>?> login(String username, String password) async {

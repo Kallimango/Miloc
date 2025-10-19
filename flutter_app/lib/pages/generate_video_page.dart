@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:io' as io;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +9,7 @@ import 'package:open_file/open_file.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
-import 'dart:html' as html;
+
 import 'package:flutter_app/services/auth_service.dart';
 
 class GenerateVideoPage extends StatefulWidget {
@@ -68,100 +67,88 @@ class _GenerateVideoPageState extends State<GenerateVideoPage> {
   }
 
   Future<void> _generateVideo() async {
-  setState(() => isGenerating = true);
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token') ?? "";
-  if (token.isEmpty || widget.progressImages.isEmpty) return;
+    setState(() => isGenerating = true);
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? "";
+    if (token.isEmpty || widget.progressImages.isEmpty) return;
 
-  final startIdx = _mapIndex(rangeStart.toInt());
-  final endIdx = _mapIndex(rangeEnd.toInt());
-  final realStart = startIdx < endIdx ? startIdx : endIdx;
-  final realEnd = startIdx < endIdx ? endIdx : startIdx;
+    final startIdx = _mapIndex(rangeStart.toInt());
+    final endIdx = _mapIndex(rangeEnd.toInt());
+    final realStart = startIdx < endIdx ? startIdx : endIdx;
+    final realEnd = startIdx < endIdx ? endIdx : startIdx;
 
-  final body = {
-    "category": widget.selectedCategory,
-    "start_index": realStart,
-    "end_index": realEnd,
-    "fps": fps,
-  };
+    final body = {
+      "category": widget.selectedCategory,
+      "start_index": realStart,
+      "end_index": realEnd,
+      "fps": fps,
+    };
 
-  final url = Uri.parse("http://127.0.0.1:8000/api/progress/video/create/");
+    final url = Uri.parse("https://miloc.awerro.com/api/progress/video/create/");
 
-  try {
-    final res = await http.post(
-      url,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: json.encode(body),
-    );
-
-    if (res.statusCode == 403) {
-      // 🚨 Weekly limit reached → show dialog
-      final data = json.decode(res.body);
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text("Weekly Limit Reached"),
-          content: Text(
-            data["detail"] ??
-                "You are only allowed to create 10 videos per week on a free plan.",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text("OK"),
-            ),
-          ],
-        ),
+    try {
+      final res = await http.post(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: json.encode(body),
       );
-      setState(() => isGenerating = false);
-      return;
-    }
 
-    if (res.statusCode != 200) {
-      _snack("Video generation failed: ${res.statusCode}");
-      setState(() => isGenerating = false);
-      return;
-    }
+      if (res.statusCode == 403) {
+        final data = json.decode(res.body);
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text("Weekly Limit Reached"),
+            content: Text(
+              data["detail"] ??
+                  "You are only allowed to create 10 videos per week on a free plan.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+        setState(() => isGenerating = false);
+        return;
+      }
 
-    final data = json.decode(res.body);
-    if (data["video_url"] != null) {
-      final absUrl = data["video_url"] as String;
-      setState(() => videoUrl = absUrl);
-      _snack("Video ready!");
-    } else {
-      _snack("Response: ${res.body}");
+      if (res.statusCode != 200) {
+        _snack("Video generation failed: ${res.statusCode}");
+        setState(() => isGenerating = false);
+        return;
+      }
+
+      final data = json.decode(res.body);
+      if (data["video_url"] != null) {
+        final absUrl = data["video_url"] as String;
+        setState(() => videoUrl = absUrl);
+        _snack("Video ready!");
+      } else {
+        _snack("Response: ${res.body}");
+      }
+    } catch (e) {
+      _snack("Error: $e");
+    } finally {
+      setState(() => isGenerating = false);
     }
-  } catch (e) {
-    _snack("Error: $e");
-  } finally {
-    setState(() => isGenerating = false);
   }
-}
-
 
   Future<void> _downloadVideo(Uint8List videoBytes) async {
     final fileName = "progress_${DateTime.now().millisecondsSinceEpoch}.mp4";
-    if (kIsWeb) {
-      final blob = html.Blob([videoBytes], 'video/mp4');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute("download", fileName)
-        ..click();
-      html.Url.revokeObjectUrl(url);
-    } else {
-      final tempDir = io.Directory.systemTemp;
-      final filePath = "${tempDir.path}/$fileName";
-      final file = io.File(filePath);
-      await file.writeAsBytes(videoBytes);
-      await OpenFile.open(filePath);
-    }
+    final tempDir = io.Directory.systemTemp;
+    final filePath = "${tempDir.path}/$fileName";
+    final file = io.File(filePath);
+    await file.writeAsBytes(videoBytes);
+    await OpenFile.open(filePath);
   }
 
-  // 🔥 Fixed: mobile shares directly, web downloads
   Future<void> _shareTo(String platform) async {
     if (videoUrl == null) {
       _snack("No video yet");
@@ -184,23 +171,12 @@ class _GenerateVideoPageState extends State<GenerateVideoPage> {
 
       final videoBytes = res.bodyBytes;
       final fileName = "progress_${DateTime.now().millisecondsSinceEpoch}.mp4";
+      final tempDir = io.Directory.systemTemp;
+      final filePath = "${tempDir.path}/$fileName";
+      final file = io.File(filePath);
+      await file.writeAsBytes(videoBytes);
 
-      if (kIsWeb) {
-        final blob = html.Blob([videoBytes], 'video/mp4');
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        final anchor = html.AnchorElement(href: url)
-          ..setAttribute("download", fileName)
-          ..click();
-        html.Url.revokeObjectUrl(url);
-        _snack("Video downloaded. Share manually on $platform.");
-      } else {
-        final tempDir = io.Directory.systemTemp;
-        final filePath = "${tempDir.path}/$fileName";
-        final file = io.File(filePath);
-        await file.writeAsBytes(videoBytes);
-
-        await Share.shareXFiles([XFile(filePath)], text: "Check out my video!");
-      }
+      await Share.shareXFiles([XFile(filePath)], text: "Check out my video!");
     } catch (e) {
       _snack("Error sharing video: $e");
     }
@@ -216,7 +192,6 @@ class _GenerateVideoPageState extends State<GenerateVideoPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 🔥 Preview now follows the LEFT dot (rangeStart) instead of right
     final displayImage = widget.imageBytesList.isNotEmpty
         ? widget.imageBytesList[_mapIndex(
             rangeStart.toInt().clamp(0, widget.imageBytesList.length - 1))]
@@ -460,7 +435,6 @@ class _GenerateVideoPageState extends State<GenerateVideoPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // 🔥 Fixed Share button
                 ElevatedButton.icon(
                   onPressed: videoUrl == null ? null : () => _shareTo("general"),
                   icon: const Icon(Icons.share, size: 26),
@@ -470,7 +444,7 @@ class _GenerateVideoPageState extends State<GenerateVideoPage> {
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // 🔥 Always red
+                    backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 25, vertical: 20),

@@ -10,7 +10,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:html' as html; // for web
 
 import 'package:flutter_app/services/auth_service.dart';
 
@@ -71,7 +70,7 @@ class _ProgressGalleryPageState extends State<ProgressGalleryPage> {
     final token = prefs.getString('token') ?? "";
     if (token.isEmpty) return;
 
-    const url = "http://127.0.0.1:8000/api/categories/";
+    const url = "https://miloc.awerro.com/api/categories/";
 
     try {
       final res = await http.get(Uri.parse(url), headers: {
@@ -102,7 +101,7 @@ class _ProgressGalleryPageState extends State<ProgressGalleryPage> {
   if (selectedCategory == null || token.isEmpty) return;
 
   final url =
-      "http://127.0.0.1:8000/api/progress/${widget.username}/${selectedCategory!}/";
+      "https://miloc.awerro.com/api/progress/${widget.username}/${selectedCategory!}/";
 
   try {
     final res = await http.get(Uri.parse(url), headers: {

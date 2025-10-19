@@ -56,7 +56,7 @@ class _CameraScreenState extends State<CameraScreen> {
       if (token == null) throw Exception("No access token found");
 
       final response = await http.get(
-        Uri.parse("http://127.0.0.1:8000/api/categories/"),
+        Uri.parse("https://miloc.awerro.com/api/categories/"),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
@@ -140,7 +140,7 @@ Future<void> _takePicture() async {
 
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://127.0.0.1:8000/api/progress/create/'),
+        Uri.parse('https://miloc.awerro.com/api/progress/create/'),
       );
 
       request.headers['Authorization'] = 'Bearer $token';

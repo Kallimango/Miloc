@@ -41,7 +41,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
   final category = prefs.getString("category") ?? "";
 
   final response = await http.post(
-    Uri.parse("http://127.0.0.1:8000/api/feedback/create/"),
+    Uri.parse("https://miloc.awerro.com/api/feedback/create/"),
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token",

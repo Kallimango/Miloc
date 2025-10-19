@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'auth_service.dart';
 
 class ApiService {
-  final String baseUrl = "http://127.0.0.1:8000/api";
+  final String baseUrl = "https://miloc.awerro.com/api";
 
   Future<List<Map<String, dynamic>>> getCategories() async {
     final token = await AuthService().getToken();
